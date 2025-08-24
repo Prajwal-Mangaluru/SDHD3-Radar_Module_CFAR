@@ -1,0 +1,1460 @@
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"cfar.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	__aeabi_i2f
+  20              		.global	__aeabi_fmul
+  21              		.global	__aeabi_fadd
+  22              		.global	__aeabi_fdiv
+  23              		.global	__aeabi_fcmplt
+  24              		.global	__aeabi_fcmpgt
+  25              		.section	.text.run_cfar,"ax",%progbits
+  26              		.align	2
+  27              		.global	run_cfar
+  28              		.thumb
+  29              		.thumb_func
+  30              		.type	run_cfar, %function
+  31              	run_cfar:
+  32              	.LFB63:
+  33              		.file 1 "cfar.c"
+   1:cfar.c        **** #include "cfar.h"
+   2:cfar.c        **** #include <math.h>
+   3:cfar.c        **** 
+   4:cfar.c        **** extern uint8_t cfar_output[NUM_OF_SAMPLES]; /**< CFAR detection output array */
+   5:cfar.c        **** 
+   6:cfar.c        **** void run_cfar(const int32_t *fft_buffer, uint16_t num_samples)
+   7:cfar.c        **** {
+  34              		.loc 1 7 0
+  35              		.cfi_startproc
+  36              		@ args = 0, pretend = 0, frame = 0
+  37              		@ frame_needed = 0, uses_anonymous_args = 0
+  38              	.LVL0:
+  39 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+  40              		.cfi_def_cfa_offset 32
+  41              		.cfi_offset 4, -32
+  42              		.cfi_offset 5, -28
+  43              		.cfi_offset 6, -24
+  44              		.cfi_offset 7, -20
+  45              		.cfi_offset 8, -16
+  46              		.cfi_offset 9, -12
+  47              		.cfi_offset 10, -8
+  48              		.cfi_offset 14, -4
+  49 0004 0646     		mov	r6, r0
+  50              	.LVL1:
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 2
+
+
+  51              	.LBB2:
+   8:cfar.c        ****     const int NG = 2;              /**< Number of guard cells */
+   9:cfar.c        ****     const int NR = 12;             /**< Number of reference cells */
+  10:cfar.c        ****     const float PFA = 1e-2f;       /**< Probability of false alarm */
+  11:cfar.c        ****     const float MIN_MAG = 1e-4f;   /**< Minimum magnitude threshold */
+  12:cfar.c        ****     const float alpha = NR * (powf(PFA, -1.0f / NR) - 1.0f); /**< Threshold scaling factor */
+  13:cfar.c        **** 
+  14:cfar.c        ****     for (int i = 0; i < num_samples; i++)
+  52              		.loc 1 14 0
+  53 0006 0023     		movs	r3, #0
+  54 0008 03E0     		b	.L2
+  55              	.LVL2:
+  56              	.L3:
+  15:cfar.c        ****         cfar_output[i] = 0; /**< Clear detection output */
+  57              		.loc 1 15 0 discriminator 3
+  58 000a 0020     		movs	r0, #0
+  59 000c 534A     		ldr	r2, .L16
+  60 000e D054     		strb	r0, [r2, r3]
+  14:cfar.c        ****         cfar_output[i] = 0; /**< Clear detection output */
+  61              		.loc 1 14 0 discriminator 3
+  62 0010 0133     		adds	r3, r3, #1
+  63              	.LVL3:
+  64              	.L2:
+  14:cfar.c        ****         cfar_output[i] = 0; /**< Clear detection output */
+  65              		.loc 1 14 0 is_stmt 0 discriminator 1
+  66 0012 8946     		mov	r9, r1
+  67 0014 8B42     		cmp	r3, r1
+  68 0016 F8DB     		blt	.L3
+  69 0018 4FF00E08 		mov	r8, #14
+  70 001c 96E0     		b	.L4
+  71              	.LVL4:
+  72              	.L12:
+  73              	.LBE2:
+  74              	.LBB3:
+  75              	.LBB4:
+  76              	.LBB5:
+  16:cfar.c        **** 
+  17:cfar.c        ****     for (int i = NR + NG; i < num_samples - (NR + NG); i++)
+  18:cfar.c        ****     {
+  19:cfar.c        ****         float noise_sum = 0.0f;
+  20:cfar.c        **** 
+  21:cfar.c        ****         /**< Sum power in leading reference cells */
+  22:cfar.c        ****         for (int j = i - NR - NG; j < i - NG; j++)
+  77              		.loc 1 22 0 is_stmt 1
+  78 001e A8F10E04 		sub	r4, r8, #14
+  79              	.LVL5:
+  80              	.LBE5:
+  19:cfar.c        **** 
+  81              		.loc 1 19 0
+  82 0022 0027     		movs	r7, #0
+  83              	.LBB7:
+  84              		.loc 1 22 0
+  85 0024 25E0     		b	.L5
+  86              	.LVL6:
+  87              	.L6:
+  88              	.LBB6:
+  23:cfar.c        ****         {
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 3
+
+
+  24:cfar.c        ****             float re = fft_buffer[2 * j]     / 2147483648.0f;
+  89              		.loc 1 24 0 discriminator 3
+  90 0026 E500     		lsls	r5, r4, #3
+  91 0028 56F83400 		ldr	r0, [r6, r4, lsl #3]
+  92 002c FFF7FEFF 		bl	__aeabi_i2f
+  93              	.LVL7:
+  94 0030 4FF04051 		mov	r1, #805306368
+  95 0034 FFF7FEFF 		bl	__aeabi_fmul
+  96              	.LVL8:
+  97 0038 8246     		mov	r10, r0
+  98              	.LVL9:
+  25:cfar.c        ****             float im = fft_buffer[2 * j + 1] / 2147483648.0f;
+  99              		.loc 1 25 0 discriminator 3
+ 100 003a 3544     		add	r5, r5, r6
+ 101 003c 6868     		ldr	r0, [r5, #4]
+ 102              	.LVL10:
+ 103 003e FFF7FEFF 		bl	__aeabi_i2f
+ 104              	.LVL11:
+ 105 0042 4FF04051 		mov	r1, #805306368
+ 106 0046 FFF7FEFF 		bl	__aeabi_fmul
+ 107              	.LVL12:
+ 108 004a 0546     		mov	r5, r0
+ 109              	.LVL13:
+  26:cfar.c        ****             noise_sum += re * re + im * im;
+ 110              		.loc 1 26 0 discriminator 3
+ 111 004c 5146     		mov	r1, r10
+ 112 004e 5046     		mov	r0, r10
+ 113              	.LVL14:
+ 114 0050 FFF7FEFF 		bl	__aeabi_fmul
+ 115              	.LVL15:
+ 116 0054 8246     		mov	r10, r0
+ 117              	.LVL16:
+ 118 0056 2946     		mov	r1, r5
+ 119 0058 2846     		mov	r0, r5
+ 120 005a FFF7FEFF 		bl	__aeabi_fmul
+ 121              	.LVL17:
+ 122 005e 0146     		mov	r1, r0
+ 123 0060 5046     		mov	r0, r10
+ 124 0062 FFF7FEFF 		bl	__aeabi_fadd
+ 125              	.LVL18:
+ 126 0066 0146     		mov	r1, r0
+ 127 0068 3846     		mov	r0, r7
+ 128 006a FFF7FEFF 		bl	__aeabi_fadd
+ 129              	.LVL19:
+ 130 006e 0746     		mov	r7, r0
+ 131              	.LVL20:
+ 132              	.LBE6:
+  22:cfar.c        ****         {
+ 133              		.loc 1 22 0 discriminator 3
+ 134 0070 0134     		adds	r4, r4, #1
+ 135              	.LVL21:
+ 136              	.L5:
+  22:cfar.c        ****         {
+ 137              		.loc 1 22 0 is_stmt 0 discriminator 1
+ 138 0072 A8F10203 		sub	r3, r8, #2
+ 139 0076 9C42     		cmp	r4, r3
+ 140 0078 D5DB     		blt	.L6
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 4
+
+
+ 141              	.LBE7:
+ 142              	.LBB8:
+  27:cfar.c        ****         }
+  28:cfar.c        **** 
+  29:cfar.c        ****         /**< Sum power in lagging reference cells */
+  30:cfar.c        ****         for (int j = i + NG + 1; j <= i + NG + NR; j++)
+ 143              		.loc 1 30 0 is_stmt 1
+ 144 007a 08F10304 		add	r4, r8, #3
+ 145              	.LVL22:
+ 146 007e 25E0     		b	.L7
+ 147              	.L8:
+ 148              	.LBB9:
+  31:cfar.c        ****         {
+  32:cfar.c        ****             float re = fft_buffer[2 * j]     / 2147483648.0f;
+ 149              		.loc 1 32 0 discriminator 3
+ 150 0080 E500     		lsls	r5, r4, #3
+ 151 0082 56F83400 		ldr	r0, [r6, r4, lsl #3]
+ 152 0086 FFF7FEFF 		bl	__aeabi_i2f
+ 153              	.LVL23:
+ 154 008a 4FF04051 		mov	r1, #805306368
+ 155 008e FFF7FEFF 		bl	__aeabi_fmul
+ 156              	.LVL24:
+ 157 0092 8246     		mov	r10, r0
+ 158              	.LVL25:
+  33:cfar.c        ****             float im = fft_buffer[2 * j + 1] / 2147483648.0f;
+ 159              		.loc 1 33 0 discriminator 3
+ 160 0094 3544     		add	r5, r5, r6
+ 161 0096 6868     		ldr	r0, [r5, #4]
+ 162              	.LVL26:
+ 163 0098 FFF7FEFF 		bl	__aeabi_i2f
+ 164              	.LVL27:
+ 165 009c 4FF04051 		mov	r1, #805306368
+ 166 00a0 FFF7FEFF 		bl	__aeabi_fmul
+ 167              	.LVL28:
+ 168 00a4 0546     		mov	r5, r0
+ 169              	.LVL29:
+  34:cfar.c        ****             noise_sum += re * re + im * im;
+ 170              		.loc 1 34 0 discriminator 3
+ 171 00a6 5146     		mov	r1, r10
+ 172 00a8 5046     		mov	r0, r10
+ 173              	.LVL30:
+ 174 00aa FFF7FEFF 		bl	__aeabi_fmul
+ 175              	.LVL31:
+ 176 00ae 8246     		mov	r10, r0
+ 177              	.LVL32:
+ 178 00b0 2946     		mov	r1, r5
+ 179 00b2 2846     		mov	r0, r5
+ 180 00b4 FFF7FEFF 		bl	__aeabi_fmul
+ 181              	.LVL33:
+ 182 00b8 0146     		mov	r1, r0
+ 183 00ba 5046     		mov	r0, r10
+ 184 00bc FFF7FEFF 		bl	__aeabi_fadd
+ 185              	.LVL34:
+ 186 00c0 0146     		mov	r1, r0
+ 187 00c2 3846     		mov	r0, r7
+ 188 00c4 FFF7FEFF 		bl	__aeabi_fadd
+ 189              	.LVL35:
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 5
+
+
+ 190 00c8 0746     		mov	r7, r0
+ 191              	.LVL36:
+ 192              	.LBE9:
+  30:cfar.c        ****         {
+ 193              		.loc 1 30 0 discriminator 3
+ 194 00ca 0134     		adds	r4, r4, #1
+ 195              	.LVL37:
+ 196              	.L7:
+  30:cfar.c        ****         {
+ 197              		.loc 1 30 0 is_stmt 0 discriminator 1
+ 198 00cc 08F10E03 		add	r3, r8, #14
+ 199 00d0 9C42     		cmp	r4, r3
+ 200 00d2 D5DD     		ble	.L8
+ 201              	.LBE8:
+  35:cfar.c        ****         }
+  36:cfar.c        **** 
+  37:cfar.c        ****         float noise_avg = noise_sum / (2.0f * NR);        /**< Average noise power */
+ 202              		.loc 1 37 0 is_stmt 1
+ 203 00d4 2249     		ldr	r1, .L16+4
+ 204 00d6 3846     		mov	r0, r7
+ 205 00d8 FFF7FEFF 		bl	__aeabi_fdiv
+ 206              	.LVL38:
+  38:cfar.c        ****         float threshold = alpha * noise_avg;              /**< Detection threshold */
+ 207              		.loc 1 38 0
+ 208 00dc 2149     		ldr	r1, .L16+8
+ 209 00de FFF7FEFF 		bl	__aeabi_fmul
+ 210              	.LVL39:
+ 211 00e2 0746     		mov	r7, r0
+ 212              	.LVL40:
+  39:cfar.c        ****         float re = fft_buffer[2 * i]     / 2147483648.0f; /**< Real part of CUT */
+ 213              		.loc 1 39 0
+ 214 00e4 4FEAC804 		lsl	r4, r8, #3
+ 215              	.LVL41:
+ 216 00e8 56F83800 		ldr	r0, [r6, r8, lsl #3]
+ 217              	.LVL42:
+ 218 00ec FFF7FEFF 		bl	__aeabi_i2f
+ 219              	.LVL43:
+ 220 00f0 4FF04051 		mov	r1, #805306368
+ 221 00f4 FFF7FEFF 		bl	__aeabi_fmul
+ 222              	.LVL44:
+ 223 00f8 0546     		mov	r5, r0
+ 224              	.LVL45:
+  40:cfar.c        ****         float im = fft_buffer[2 * i + 1] / 2147483648.0f; /**< Imaginary part of CUT */
+ 225              		.loc 1 40 0
+ 226 00fa 3444     		add	r4, r4, r6
+ 227 00fc 6068     		ldr	r0, [r4, #4]
+ 228              	.LVL46:
+ 229 00fe FFF7FEFF 		bl	__aeabi_i2f
+ 230              	.LVL47:
+ 231 0102 4FF04051 		mov	r1, #805306368
+ 232 0106 FFF7FEFF 		bl	__aeabi_fmul
+ 233              	.LVL48:
+ 234 010a 0446     		mov	r4, r0
+ 235              	.LVL49:
+  41:cfar.c        ****         float magnitude = re * re + im * im;              /**< Power at CUT */
+ 236              		.loc 1 41 0
+ 237 010c 2946     		mov	r1, r5
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 6
+
+
+ 238 010e 2846     		mov	r0, r5
+ 239              	.LVL50:
+ 240 0110 FFF7FEFF 		bl	__aeabi_fmul
+ 241              	.LVL51:
+ 242 0114 0546     		mov	r5, r0
+ 243              	.LVL52:
+ 244 0116 2146     		mov	r1, r4
+ 245 0118 2046     		mov	r0, r4
+ 246 011a FFF7FEFF 		bl	__aeabi_fmul
+ 247              	.LVL53:
+ 248 011e 0146     		mov	r1, r0
+ 249 0120 2846     		mov	r0, r5
+ 250 0122 FFF7FEFF 		bl	__aeabi_fadd
+ 251              	.LVL54:
+ 252 0126 0446     		mov	r4, r0
+ 253              	.LVL55:
+  42:cfar.c        **** 
+  43:cfar.c        ****         if (magnitude > threshold && magnitude > MIN_MAG)
+ 254              		.loc 1 43 0
+ 255 0128 0146     		mov	r1, r0
+ 256 012a 3846     		mov	r0, r7
+ 257              	.LVL56:
+ 258 012c FFF7FEFF 		bl	__aeabi_fcmplt
+ 259              	.LVL57:
+ 260 0130 50B1     		cbz	r0, .L9
+ 261              		.loc 1 43 0 is_stmt 0 discriminator 1
+ 262 0132 0D49     		ldr	r1, .L16+12
+ 263 0134 2046     		mov	r0, r4
+ 264 0136 FFF7FEFF 		bl	__aeabi_fcmpgt
+ 265              	.LVL58:
+ 266 013a 28B1     		cbz	r0, .L9
+  44:cfar.c        ****         {
+  45:cfar.c        ****             cfar_output[i] = 1;      /**< Mark detection */
+ 267              		.loc 1 45 0 is_stmt 1
+ 268 013c 0120     		movs	r0, #1
+ 269 013e 074B     		ldr	r3, .L16
+ 270 0140 03F80800 		strb	r0, [r3, r8]
+  46:cfar.c        ****             led_red_Write(1);       /**< Turn on red LED */
+ 271              		.loc 1 46 0
+ 272 0144 FFF7FEFF 		bl	led_red_Write
+ 273              	.LVL59:
+ 274              	.L9:
+ 275              	.LBE4:
+  17:cfar.c        ****     {
+ 276              		.loc 1 17 0 discriminator 2
+ 277 0148 08F10108 		add	r8, r8, #1
+ 278              	.LVL60:
+ 279              	.L4:
+  17:cfar.c        ****     {
+ 280              		.loc 1 17 0 is_stmt 0 discriminator 1
+ 281 014c A9F10E03 		sub	r3, r9, #14
+ 282 0150 9845     		cmp	r8, r3
+ 283 0152 FFF664AF 		blt	.L12
+ 284              	.LBE3:
+  47:cfar.c        ****         }
+  48:cfar.c        ****     }
+  49:cfar.c        **** }
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 7
+
+
+ 285              		.loc 1 49 0 is_stmt 1
+ 286 0156 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 287              	.LVL61:
+ 288              	.L17:
+ 289 015a 00BF     		.align	2
+ 290              	.L16:
+ 291 015c 00000000 		.word	cfar_output
+ 292 0160 0000C041 		.word	1103101952
+ 293 0164 8BA2B340 		.word	1085514379
+ 294 0168 17B7D138 		.word	953267991
+ 295              		.cfi_endproc
+ 296              	.LFE63:
+ 297              		.size	run_cfar, .-run_cfar
+ 298              		.comm	cfar_output,1024,4
+ 299              		.text
+ 300              	.Letext0:
+ 301              		.file 2 "d:\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-eabi\\include\\mac
+ 302              		.file 3 "d:\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-eabi\\include\\sys
+ 303              		.file 4 "Generated_Source\\PSoC5/core_cm3.h"
+ 304              		.file 5 "Generated_Source\\PSoC5/led_red.h"
+ 305              		.section	.debug_info,"",%progbits
+ 306              	.Ldebug_info0:
+ 307 0000 BB020000 		.4byte	0x2bb
+ 308 0004 0400     		.2byte	0x4
+ 309 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 310 000a 04       		.byte	0x4
+ 311 000b 01       		.uleb128 0x1
+ 312 000c 60000000 		.4byte	.LASF30
+ 313 0010 0C       		.byte	0xc
+ 314 0011 32010000 		.4byte	.LASF31
+ 315 0015 EF010000 		.4byte	.LASF32
+ 316 0019 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 317 001d 00000000 		.4byte	0
+ 318 0021 00000000 		.4byte	.Ldebug_line0
+ 319 0025 02       		.uleb128 0x2
+ 320 0026 01       		.byte	0x1
+ 321 0027 06       		.byte	0x6
+ 322 0028 E3010000 		.4byte	.LASF0
+ 323 002c 03       		.uleb128 0x3
+ 324 002d 0B000000 		.4byte	.LASF3
+ 325 0031 02       		.byte	0x2
+ 326 0032 1D       		.byte	0x1d
+ 327 0033 37000000 		.4byte	0x37
+ 328 0037 02       		.uleb128 0x2
+ 329 0038 01       		.byte	0x1
+ 330 0039 08       		.byte	0x8
+ 331 003a 52000000 		.4byte	.LASF1
+ 332 003e 02       		.uleb128 0x2
+ 333 003f 02       		.byte	0x2
+ 334 0040 05       		.byte	0x5
+ 335 0041 A8010000 		.4byte	.LASF2
+ 336 0045 03       		.uleb128 0x3
+ 337 0046 20010000 		.4byte	.LASF4
+ 338 004a 02       		.byte	0x2
+ 339 004b 2B       		.byte	0x2b
+ 340 004c 50000000 		.4byte	0x50
+ 341 0050 02       		.uleb128 0x2
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 8
+
+
+ 342 0051 02       		.byte	0x2
+ 343 0052 07       		.byte	0x7
+ 344 0053 00010000 		.4byte	.LASF5
+ 345 0057 03       		.uleb128 0x3
+ 346 0058 15000000 		.4byte	.LASF6
+ 347 005c 02       		.byte	0x2
+ 348 005d 3F       		.byte	0x3f
+ 349 005e 62000000 		.4byte	0x62
+ 350 0062 02       		.uleb128 0x2
+ 351 0063 04       		.byte	0x4
+ 352 0064 05       		.byte	0x5
+ 353 0065 1F000000 		.4byte	.LASF7
+ 354 0069 02       		.uleb128 0x2
+ 355 006a 04       		.byte	0x4
+ 356 006b 07       		.byte	0x7
+ 357 006c EE000000 		.4byte	.LASF8
+ 358 0070 02       		.uleb128 0x2
+ 359 0071 08       		.byte	0x8
+ 360 0072 05       		.byte	0x5
+ 361 0073 95010000 		.4byte	.LASF9
+ 362 0077 02       		.uleb128 0x2
+ 363 0078 08       		.byte	0x8
+ 364 0079 07       		.byte	0x7
+ 365 007a 50010000 		.4byte	.LASF10
+ 366 007e 04       		.uleb128 0x4
+ 367 007f 04       		.byte	0x4
+ 368 0080 05       		.byte	0x5
+ 369 0081 696E7400 		.ascii	"int\000"
+ 370 0085 02       		.uleb128 0x2
+ 371 0086 04       		.byte	0x4
+ 372 0087 07       		.byte	0x7
+ 373 0088 43010000 		.4byte	.LASF11
+ 374 008c 03       		.uleb128 0x3
+ 375 008d 67010000 		.4byte	.LASF12
+ 376 0091 03       		.byte	0x3
+ 377 0092 18       		.byte	0x18
+ 378 0093 2C000000 		.4byte	0x2c
+ 379 0097 03       		.uleb128 0x3
+ 380 0098 BA010000 		.4byte	.LASF13
+ 381 009c 03       		.byte	0x3
+ 382 009d 24       		.byte	0x24
+ 383 009e 45000000 		.4byte	0x45
+ 384 00a2 03       		.uleb128 0x3
+ 385 00a3 84010000 		.4byte	.LASF14
+ 386 00a7 03       		.byte	0x3
+ 387 00a8 2C       		.byte	0x2c
+ 388 00a9 57000000 		.4byte	0x57
+ 389 00ad 02       		.uleb128 0x2
+ 390 00ae 04       		.byte	0x4
+ 391 00af 04       		.byte	0x4
+ 392 00b0 42000000 		.4byte	.LASF15
+ 393 00b4 02       		.uleb128 0x2
+ 394 00b5 08       		.byte	0x8
+ 395 00b6 04       		.byte	0x4
+ 396 00b7 2B010000 		.4byte	.LASF16
+ 397 00bb 02       		.uleb128 0x2
+ 398 00bc 01       		.byte	0x1
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 9
+
+
+ 399 00bd 08       		.byte	0x8
+ 400 00be A3010000 		.4byte	.LASF17
+ 401 00c2 02       		.uleb128 0x2
+ 402 00c3 08       		.byte	0x8
+ 403 00c4 04       		.byte	0x4
+ 404 00c5 D7010000 		.4byte	.LASF18
+ 405 00c9 02       		.uleb128 0x2
+ 406 00ca 04       		.byte	0x4
+ 407 00cb 07       		.byte	0x7
+ 408 00cc 8C010000 		.4byte	.LASF19
+ 409 00d0 05       		.uleb128 0x5
+ 410 00d1 6F010000 		.4byte	.LASF33
+ 411 00d5 01       		.byte	0x1
+ 412 00d6 06       		.byte	0x6
+ 413 00d7 00000000 		.4byte	.LFB63
+ 414 00db 6C010000 		.4byte	.LFE63-.LFB63
+ 415 00df 01       		.uleb128 0x1
+ 416 00e0 9C       		.byte	0x9c
+ 417 00e1 6B020000 		.4byte	0x26b
+ 418 00e5 06       		.uleb128 0x6
+ 419 00e6 00000000 		.4byte	.LASF20
+ 420 00ea 01       		.byte	0x1
+ 421 00eb 06       		.byte	0x6
+ 422 00ec 6B020000 		.4byte	0x26b
+ 423 00f0 00000000 		.4byte	.LLST0
+ 424 00f4 06       		.uleb128 0x6
+ 425 00f5 28000000 		.4byte	.LASF21
+ 426 00f9 01       		.byte	0x1
+ 427 00fa 06       		.byte	0x6
+ 428 00fb 97000000 		.4byte	0x97
+ 429 00ff 2C000000 		.4byte	.LLST1
+ 430 0103 07       		.uleb128 0x7
+ 431 0104 4E4700   		.ascii	"NG\000"
+ 432 0107 01       		.byte	0x1
+ 433 0108 08       		.byte	0x8
+ 434 0109 76020000 		.4byte	0x276
+ 435 010d 02       		.byte	0x2
+ 436 010e 07       		.uleb128 0x7
+ 437 010f 4E5200   		.ascii	"NR\000"
+ 438 0112 01       		.byte	0x1
+ 439 0113 09       		.byte	0x9
+ 440 0114 76020000 		.4byte	0x276
+ 441 0118 0C       		.byte	0xc
+ 442 0119 08       		.uleb128 0x8
+ 443 011a 50464100 		.ascii	"PFA\000"
+ 444 011e 01       		.byte	0x1
+ 445 011f 0A       		.byte	0xa
+ 446 0120 7B020000 		.4byte	0x27b
+ 447 0124 04       		.byte	0x4
+ 448 0125 0AD7233C 		.4byte	0x3c23d70a
+ 449 0129 09       		.uleb128 0x9
+ 450 012a B2010000 		.4byte	.LASF22
+ 451 012e 01       		.byte	0x1
+ 452 012f 0B       		.byte	0xb
+ 453 0130 7B020000 		.4byte	0x27b
+ 454 0134 04       		.byte	0x4
+ 455 0135 17B7D138 		.4byte	0x38d1b717
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 10
+
+
+ 456 0139 09       		.uleb128 0x9
+ 457 013a 59020000 		.4byte	.LASF23
+ 458 013e 01       		.byte	0x1
+ 459 013f 0C       		.byte	0xc
+ 460 0140 7B020000 		.4byte	0x27b
+ 461 0144 04       		.byte	0x4
+ 462 0145 8BA2B340 		.4byte	0x40b3a28b
+ 463 0149 0A       		.uleb128 0xa
+ 464 014a 06000000 		.4byte	.LBB2
+ 465 014e 18000000 		.4byte	.LBE2-.LBB2
+ 466 0152 64010000 		.4byte	0x164
+ 467 0156 0B       		.uleb128 0xb
+ 468 0157 6900     		.ascii	"i\000"
+ 469 0159 01       		.byte	0x1
+ 470 015a 0E       		.byte	0xe
+ 471 015b 7E000000 		.4byte	0x7e
+ 472 015f 4D000000 		.4byte	.LLST2
+ 473 0163 00       		.byte	0
+ 474 0164 0C       		.uleb128 0xc
+ 475 0165 1E000000 		.4byte	.LBB3
+ 476 0169 38010000 		.4byte	.LBE3-.LBB3
+ 477 016d 0B       		.uleb128 0xb
+ 478 016e 6900     		.ascii	"i\000"
+ 479 0170 01       		.byte	0x1
+ 480 0171 11       		.byte	0x11
+ 481 0172 7E000000 		.4byte	0x7e
+ 482 0176 6C000000 		.4byte	.LLST3
+ 483 017a 0C       		.uleb128 0xc
+ 484 017b 1E000000 		.4byte	.LBB4
+ 485 017f 2A010000 		.4byte	.LBE4-.LBB4
+ 486 0183 0D       		.uleb128 0xd
+ 487 0184 48000000 		.4byte	.LASF24
+ 488 0188 01       		.byte	0x1
+ 489 0189 13       		.byte	0x13
+ 490 018a AD000000 		.4byte	0xad
+ 491 018e 7F000000 		.4byte	.LLST4
+ 492 0192 0D       		.uleb128 0xd
+ 493 0193 39010000 		.4byte	.LASF25
+ 494 0197 01       		.byte	0x1
+ 495 0198 25       		.byte	0x25
+ 496 0199 AD000000 		.4byte	0xad
+ 497 019d CE000000 		.4byte	.LLST5
+ 498 01a1 0D       		.uleb128 0xd
+ 499 01a2 CD010000 		.4byte	.LASF26
+ 500 01a6 01       		.byte	0x1
+ 501 01a7 26       		.byte	0x26
+ 502 01a8 AD000000 		.4byte	0xad
+ 503 01ac E1000000 		.4byte	.LLST6
+ 504 01b0 0B       		.uleb128 0xb
+ 505 01b1 726500   		.ascii	"re\000"
+ 506 01b4 01       		.byte	0x1
+ 507 01b5 27       		.byte	0x27
+ 508 01b6 AD000000 		.4byte	0xad
+ 509 01ba FF000000 		.4byte	.LLST7
+ 510 01be 0B       		.uleb128 0xb
+ 511 01bf 696D00   		.ascii	"im\000"
+ 512 01c2 01       		.byte	0x1
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 11
+
+
+ 513 01c3 28       		.byte	0x28
+ 514 01c4 AD000000 		.4byte	0xad
+ 515 01c8 1D010000 		.4byte	.LLST8
+ 516 01cc 0D       		.uleb128 0xd
+ 517 01cd C3010000 		.4byte	.LASF27
+ 518 01d1 01       		.byte	0x1
+ 519 01d2 29       		.byte	0x29
+ 520 01d3 AD000000 		.4byte	0xad
+ 521 01d7 3B010000 		.4byte	.LLST9
+ 522 01db 0E       		.uleb128 0xe
+ 523 01dc 00000000 		.4byte	.Ldebug_ranges0+0
+ 524 01e0 18020000 		.4byte	0x218
+ 525 01e4 0B       		.uleb128 0xb
+ 526 01e5 6A00     		.ascii	"j\000"
+ 527 01e7 01       		.byte	0x1
+ 528 01e8 16       		.byte	0x16
+ 529 01e9 7E000000 		.4byte	0x7e
+ 530 01ed 64010000 		.4byte	.LLST10
+ 531 01f1 0C       		.uleb128 0xc
+ 532 01f2 26000000 		.4byte	.LBB6
+ 533 01f6 4A000000 		.4byte	.LBE6-.LBB6
+ 534 01fa 0B       		.uleb128 0xb
+ 535 01fb 726500   		.ascii	"re\000"
+ 536 01fe 01       		.byte	0x1
+ 537 01ff 18       		.byte	0x18
+ 538 0200 AD000000 		.4byte	0xad
+ 539 0204 77010000 		.4byte	.LLST11
+ 540 0208 0B       		.uleb128 0xb
+ 541 0209 696D00   		.ascii	"im\000"
+ 542 020c 01       		.byte	0x1
+ 543 020d 19       		.byte	0x19
+ 544 020e AD000000 		.4byte	0xad
+ 545 0212 95010000 		.4byte	.LLST12
+ 546 0216 00       		.byte	0
+ 547 0217 00       		.byte	0
+ 548 0218 0A       		.uleb128 0xa
+ 549 0219 7A000000 		.4byte	.LBB8
+ 550 021d 5A000000 		.4byte	.LBE8-.LBB8
+ 551 0221 59020000 		.4byte	0x259
+ 552 0225 0B       		.uleb128 0xb
+ 553 0226 6A00     		.ascii	"j\000"
+ 554 0228 01       		.byte	0x1
+ 555 0229 1E       		.byte	0x1e
+ 556 022a 7E000000 		.4byte	0x7e
+ 557 022e B3010000 		.4byte	.LLST13
+ 558 0232 0C       		.uleb128 0xc
+ 559 0233 80000000 		.4byte	.LBB9
+ 560 0237 4A000000 		.4byte	.LBE9-.LBB9
+ 561 023b 0B       		.uleb128 0xb
+ 562 023c 726500   		.ascii	"re\000"
+ 563 023f 01       		.byte	0x1
+ 564 0240 20       		.byte	0x20
+ 565 0241 AD000000 		.4byte	0xad
+ 566 0245 C6010000 		.4byte	.LLST14
+ 567 0249 0B       		.uleb128 0xb
+ 568 024a 696D00   		.ascii	"im\000"
+ 569 024d 01       		.byte	0x1
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 12
+
+
+ 570 024e 21       		.byte	0x21
+ 571 024f AD000000 		.4byte	0xad
+ 572 0253 E4010000 		.4byte	.LLST15
+ 573 0257 00       		.byte	0
+ 574 0258 00       		.byte	0
+ 575 0259 0F       		.uleb128 0xf
+ 576 025a 48010000 		.4byte	.LVL59
+ 577 025e B3020000 		.4byte	0x2b3
+ 578 0262 10       		.uleb128 0x10
+ 579 0263 01       		.uleb128 0x1
+ 580 0264 50       		.byte	0x50
+ 581 0265 01       		.uleb128 0x1
+ 582 0266 31       		.byte	0x31
+ 583 0267 00       		.byte	0
+ 584 0268 00       		.byte	0
+ 585 0269 00       		.byte	0
+ 586 026a 00       		.byte	0
+ 587 026b 11       		.uleb128 0x11
+ 588 026c 04       		.byte	0x4
+ 589 026d 71020000 		.4byte	0x271
+ 590 0271 12       		.uleb128 0x12
+ 591 0272 A2000000 		.4byte	0xa2
+ 592 0276 12       		.uleb128 0x12
+ 593 0277 7E000000 		.4byte	0x7e
+ 594 027b 12       		.uleb128 0x12
+ 595 027c AD000000 		.4byte	0xad
+ 596 0280 13       		.uleb128 0x13
+ 597 0281 13010000 		.4byte	.LASF28
+ 598 0285 04       		.byte	0x4
+ 599 0286 1207     		.2byte	0x712
+ 600 0288 8C020000 		.4byte	0x28c
+ 601 028c 14       		.uleb128 0x14
+ 602 028d A2000000 		.4byte	0xa2
+ 603 0291 15       		.uleb128 0x15
+ 604 0292 8C000000 		.4byte	0x8c
+ 605 0296 A2020000 		.4byte	0x2a2
+ 606 029a 16       		.uleb128 0x16
+ 607 029b C9000000 		.4byte	0xc9
+ 608 029f FF03     		.2byte	0x3ff
+ 609 02a1 00       		.byte	0
+ 610 02a2 17       		.uleb128 0x17
+ 611 02a3 78010000 		.4byte	.LASF29
+ 612 02a7 01       		.byte	0x1
+ 613 02a8 04       		.byte	0x4
+ 614 02a9 91020000 		.4byte	0x291
+ 615 02ad 05       		.uleb128 0x5
+ 616 02ae 03       		.byte	0x3
+ 617 02af 00000000 		.4byte	cfar_output
+ 618 02b3 18       		.uleb128 0x18
+ 619 02b4 34000000 		.4byte	.LASF34
+ 620 02b8 34000000 		.4byte	.LASF34
+ 621 02bc 05       		.byte	0x5
+ 622 02bd 26       		.byte	0x26
+ 623 02be 00       		.byte	0
+ 624              		.section	.debug_abbrev,"",%progbits
+ 625              	.Ldebug_abbrev0:
+ 626 0000 01       		.uleb128 0x1
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 13
+
+
+ 627 0001 11       		.uleb128 0x11
+ 628 0002 01       		.byte	0x1
+ 629 0003 25       		.uleb128 0x25
+ 630 0004 0E       		.uleb128 0xe
+ 631 0005 13       		.uleb128 0x13
+ 632 0006 0B       		.uleb128 0xb
+ 633 0007 03       		.uleb128 0x3
+ 634 0008 0E       		.uleb128 0xe
+ 635 0009 1B       		.uleb128 0x1b
+ 636 000a 0E       		.uleb128 0xe
+ 637 000b 55       		.uleb128 0x55
+ 638 000c 17       		.uleb128 0x17
+ 639 000d 11       		.uleb128 0x11
+ 640 000e 01       		.uleb128 0x1
+ 641 000f 10       		.uleb128 0x10
+ 642 0010 17       		.uleb128 0x17
+ 643 0011 00       		.byte	0
+ 644 0012 00       		.byte	0
+ 645 0013 02       		.uleb128 0x2
+ 646 0014 24       		.uleb128 0x24
+ 647 0015 00       		.byte	0
+ 648 0016 0B       		.uleb128 0xb
+ 649 0017 0B       		.uleb128 0xb
+ 650 0018 3E       		.uleb128 0x3e
+ 651 0019 0B       		.uleb128 0xb
+ 652 001a 03       		.uleb128 0x3
+ 653 001b 0E       		.uleb128 0xe
+ 654 001c 00       		.byte	0
+ 655 001d 00       		.byte	0
+ 656 001e 03       		.uleb128 0x3
+ 657 001f 16       		.uleb128 0x16
+ 658 0020 00       		.byte	0
+ 659 0021 03       		.uleb128 0x3
+ 660 0022 0E       		.uleb128 0xe
+ 661 0023 3A       		.uleb128 0x3a
+ 662 0024 0B       		.uleb128 0xb
+ 663 0025 3B       		.uleb128 0x3b
+ 664 0026 0B       		.uleb128 0xb
+ 665 0027 49       		.uleb128 0x49
+ 666 0028 13       		.uleb128 0x13
+ 667 0029 00       		.byte	0
+ 668 002a 00       		.byte	0
+ 669 002b 04       		.uleb128 0x4
+ 670 002c 24       		.uleb128 0x24
+ 671 002d 00       		.byte	0
+ 672 002e 0B       		.uleb128 0xb
+ 673 002f 0B       		.uleb128 0xb
+ 674 0030 3E       		.uleb128 0x3e
+ 675 0031 0B       		.uleb128 0xb
+ 676 0032 03       		.uleb128 0x3
+ 677 0033 08       		.uleb128 0x8
+ 678 0034 00       		.byte	0
+ 679 0035 00       		.byte	0
+ 680 0036 05       		.uleb128 0x5
+ 681 0037 2E       		.uleb128 0x2e
+ 682 0038 01       		.byte	0x1
+ 683 0039 3F       		.uleb128 0x3f
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 14
+
+
+ 684 003a 19       		.uleb128 0x19
+ 685 003b 03       		.uleb128 0x3
+ 686 003c 0E       		.uleb128 0xe
+ 687 003d 3A       		.uleb128 0x3a
+ 688 003e 0B       		.uleb128 0xb
+ 689 003f 3B       		.uleb128 0x3b
+ 690 0040 0B       		.uleb128 0xb
+ 691 0041 27       		.uleb128 0x27
+ 692 0042 19       		.uleb128 0x19
+ 693 0043 11       		.uleb128 0x11
+ 694 0044 01       		.uleb128 0x1
+ 695 0045 12       		.uleb128 0x12
+ 696 0046 06       		.uleb128 0x6
+ 697 0047 40       		.uleb128 0x40
+ 698 0048 18       		.uleb128 0x18
+ 699 0049 9642     		.uleb128 0x2116
+ 700 004b 19       		.uleb128 0x19
+ 701 004c 01       		.uleb128 0x1
+ 702 004d 13       		.uleb128 0x13
+ 703 004e 00       		.byte	0
+ 704 004f 00       		.byte	0
+ 705 0050 06       		.uleb128 0x6
+ 706 0051 05       		.uleb128 0x5
+ 707 0052 00       		.byte	0
+ 708 0053 03       		.uleb128 0x3
+ 709 0054 0E       		.uleb128 0xe
+ 710 0055 3A       		.uleb128 0x3a
+ 711 0056 0B       		.uleb128 0xb
+ 712 0057 3B       		.uleb128 0x3b
+ 713 0058 0B       		.uleb128 0xb
+ 714 0059 49       		.uleb128 0x49
+ 715 005a 13       		.uleb128 0x13
+ 716 005b 02       		.uleb128 0x2
+ 717 005c 17       		.uleb128 0x17
+ 718 005d 00       		.byte	0
+ 719 005e 00       		.byte	0
+ 720 005f 07       		.uleb128 0x7
+ 721 0060 34       		.uleb128 0x34
+ 722 0061 00       		.byte	0
+ 723 0062 03       		.uleb128 0x3
+ 724 0063 08       		.uleb128 0x8
+ 725 0064 3A       		.uleb128 0x3a
+ 726 0065 0B       		.uleb128 0xb
+ 727 0066 3B       		.uleb128 0x3b
+ 728 0067 0B       		.uleb128 0xb
+ 729 0068 49       		.uleb128 0x49
+ 730 0069 13       		.uleb128 0x13
+ 731 006a 1C       		.uleb128 0x1c
+ 732 006b 0B       		.uleb128 0xb
+ 733 006c 00       		.byte	0
+ 734 006d 00       		.byte	0
+ 735 006e 08       		.uleb128 0x8
+ 736 006f 34       		.uleb128 0x34
+ 737 0070 00       		.byte	0
+ 738 0071 03       		.uleb128 0x3
+ 739 0072 08       		.uleb128 0x8
+ 740 0073 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 15
+
+
+ 741 0074 0B       		.uleb128 0xb
+ 742 0075 3B       		.uleb128 0x3b
+ 743 0076 0B       		.uleb128 0xb
+ 744 0077 49       		.uleb128 0x49
+ 745 0078 13       		.uleb128 0x13
+ 746 0079 1C       		.uleb128 0x1c
+ 747 007a 0A       		.uleb128 0xa
+ 748 007b 00       		.byte	0
+ 749 007c 00       		.byte	0
+ 750 007d 09       		.uleb128 0x9
+ 751 007e 34       		.uleb128 0x34
+ 752 007f 00       		.byte	0
+ 753 0080 03       		.uleb128 0x3
+ 754 0081 0E       		.uleb128 0xe
+ 755 0082 3A       		.uleb128 0x3a
+ 756 0083 0B       		.uleb128 0xb
+ 757 0084 3B       		.uleb128 0x3b
+ 758 0085 0B       		.uleb128 0xb
+ 759 0086 49       		.uleb128 0x49
+ 760 0087 13       		.uleb128 0x13
+ 761 0088 1C       		.uleb128 0x1c
+ 762 0089 0A       		.uleb128 0xa
+ 763 008a 00       		.byte	0
+ 764 008b 00       		.byte	0
+ 765 008c 0A       		.uleb128 0xa
+ 766 008d 0B       		.uleb128 0xb
+ 767 008e 01       		.byte	0x1
+ 768 008f 11       		.uleb128 0x11
+ 769 0090 01       		.uleb128 0x1
+ 770 0091 12       		.uleb128 0x12
+ 771 0092 06       		.uleb128 0x6
+ 772 0093 01       		.uleb128 0x1
+ 773 0094 13       		.uleb128 0x13
+ 774 0095 00       		.byte	0
+ 775 0096 00       		.byte	0
+ 776 0097 0B       		.uleb128 0xb
+ 777 0098 34       		.uleb128 0x34
+ 778 0099 00       		.byte	0
+ 779 009a 03       		.uleb128 0x3
+ 780 009b 08       		.uleb128 0x8
+ 781 009c 3A       		.uleb128 0x3a
+ 782 009d 0B       		.uleb128 0xb
+ 783 009e 3B       		.uleb128 0x3b
+ 784 009f 0B       		.uleb128 0xb
+ 785 00a0 49       		.uleb128 0x49
+ 786 00a1 13       		.uleb128 0x13
+ 787 00a2 02       		.uleb128 0x2
+ 788 00a3 17       		.uleb128 0x17
+ 789 00a4 00       		.byte	0
+ 790 00a5 00       		.byte	0
+ 791 00a6 0C       		.uleb128 0xc
+ 792 00a7 0B       		.uleb128 0xb
+ 793 00a8 01       		.byte	0x1
+ 794 00a9 11       		.uleb128 0x11
+ 795 00aa 01       		.uleb128 0x1
+ 796 00ab 12       		.uleb128 0x12
+ 797 00ac 06       		.uleb128 0x6
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 16
+
+
+ 798 00ad 00       		.byte	0
+ 799 00ae 00       		.byte	0
+ 800 00af 0D       		.uleb128 0xd
+ 801 00b0 34       		.uleb128 0x34
+ 802 00b1 00       		.byte	0
+ 803 00b2 03       		.uleb128 0x3
+ 804 00b3 0E       		.uleb128 0xe
+ 805 00b4 3A       		.uleb128 0x3a
+ 806 00b5 0B       		.uleb128 0xb
+ 807 00b6 3B       		.uleb128 0x3b
+ 808 00b7 0B       		.uleb128 0xb
+ 809 00b8 49       		.uleb128 0x49
+ 810 00b9 13       		.uleb128 0x13
+ 811 00ba 02       		.uleb128 0x2
+ 812 00bb 17       		.uleb128 0x17
+ 813 00bc 00       		.byte	0
+ 814 00bd 00       		.byte	0
+ 815 00be 0E       		.uleb128 0xe
+ 816 00bf 0B       		.uleb128 0xb
+ 817 00c0 01       		.byte	0x1
+ 818 00c1 55       		.uleb128 0x55
+ 819 00c2 17       		.uleb128 0x17
+ 820 00c3 01       		.uleb128 0x1
+ 821 00c4 13       		.uleb128 0x13
+ 822 00c5 00       		.byte	0
+ 823 00c6 00       		.byte	0
+ 824 00c7 0F       		.uleb128 0xf
+ 825 00c8 898201   		.uleb128 0x4109
+ 826 00cb 01       		.byte	0x1
+ 827 00cc 11       		.uleb128 0x11
+ 828 00cd 01       		.uleb128 0x1
+ 829 00ce 31       		.uleb128 0x31
+ 830 00cf 13       		.uleb128 0x13
+ 831 00d0 00       		.byte	0
+ 832 00d1 00       		.byte	0
+ 833 00d2 10       		.uleb128 0x10
+ 834 00d3 8A8201   		.uleb128 0x410a
+ 835 00d6 00       		.byte	0
+ 836 00d7 02       		.uleb128 0x2
+ 837 00d8 18       		.uleb128 0x18
+ 838 00d9 9142     		.uleb128 0x2111
+ 839 00db 18       		.uleb128 0x18
+ 840 00dc 00       		.byte	0
+ 841 00dd 00       		.byte	0
+ 842 00de 11       		.uleb128 0x11
+ 843 00df 0F       		.uleb128 0xf
+ 844 00e0 00       		.byte	0
+ 845 00e1 0B       		.uleb128 0xb
+ 846 00e2 0B       		.uleb128 0xb
+ 847 00e3 49       		.uleb128 0x49
+ 848 00e4 13       		.uleb128 0x13
+ 849 00e5 00       		.byte	0
+ 850 00e6 00       		.byte	0
+ 851 00e7 12       		.uleb128 0x12
+ 852 00e8 26       		.uleb128 0x26
+ 853 00e9 00       		.byte	0
+ 854 00ea 49       		.uleb128 0x49
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 17
+
+
+ 855 00eb 13       		.uleb128 0x13
+ 856 00ec 00       		.byte	0
+ 857 00ed 00       		.byte	0
+ 858 00ee 13       		.uleb128 0x13
+ 859 00ef 34       		.uleb128 0x34
+ 860 00f0 00       		.byte	0
+ 861 00f1 03       		.uleb128 0x3
+ 862 00f2 0E       		.uleb128 0xe
+ 863 00f3 3A       		.uleb128 0x3a
+ 864 00f4 0B       		.uleb128 0xb
+ 865 00f5 3B       		.uleb128 0x3b
+ 866 00f6 05       		.uleb128 0x5
+ 867 00f7 49       		.uleb128 0x49
+ 868 00f8 13       		.uleb128 0x13
+ 869 00f9 3F       		.uleb128 0x3f
+ 870 00fa 19       		.uleb128 0x19
+ 871 00fb 3C       		.uleb128 0x3c
+ 872 00fc 19       		.uleb128 0x19
+ 873 00fd 00       		.byte	0
+ 874 00fe 00       		.byte	0
+ 875 00ff 14       		.uleb128 0x14
+ 876 0100 35       		.uleb128 0x35
+ 877 0101 00       		.byte	0
+ 878 0102 49       		.uleb128 0x49
+ 879 0103 13       		.uleb128 0x13
+ 880 0104 00       		.byte	0
+ 881 0105 00       		.byte	0
+ 882 0106 15       		.uleb128 0x15
+ 883 0107 01       		.uleb128 0x1
+ 884 0108 01       		.byte	0x1
+ 885 0109 49       		.uleb128 0x49
+ 886 010a 13       		.uleb128 0x13
+ 887 010b 01       		.uleb128 0x1
+ 888 010c 13       		.uleb128 0x13
+ 889 010d 00       		.byte	0
+ 890 010e 00       		.byte	0
+ 891 010f 16       		.uleb128 0x16
+ 892 0110 21       		.uleb128 0x21
+ 893 0111 00       		.byte	0
+ 894 0112 49       		.uleb128 0x49
+ 895 0113 13       		.uleb128 0x13
+ 896 0114 2F       		.uleb128 0x2f
+ 897 0115 05       		.uleb128 0x5
+ 898 0116 00       		.byte	0
+ 899 0117 00       		.byte	0
+ 900 0118 17       		.uleb128 0x17
+ 901 0119 34       		.uleb128 0x34
+ 902 011a 00       		.byte	0
+ 903 011b 03       		.uleb128 0x3
+ 904 011c 0E       		.uleb128 0xe
+ 905 011d 3A       		.uleb128 0x3a
+ 906 011e 0B       		.uleb128 0xb
+ 907 011f 3B       		.uleb128 0x3b
+ 908 0120 0B       		.uleb128 0xb
+ 909 0121 49       		.uleb128 0x49
+ 910 0122 13       		.uleb128 0x13
+ 911 0123 3F       		.uleb128 0x3f
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 18
+
+
+ 912 0124 19       		.uleb128 0x19
+ 913 0125 02       		.uleb128 0x2
+ 914 0126 18       		.uleb128 0x18
+ 915 0127 00       		.byte	0
+ 916 0128 00       		.byte	0
+ 917 0129 18       		.uleb128 0x18
+ 918 012a 2E       		.uleb128 0x2e
+ 919 012b 00       		.byte	0
+ 920 012c 3F       		.uleb128 0x3f
+ 921 012d 19       		.uleb128 0x19
+ 922 012e 3C       		.uleb128 0x3c
+ 923 012f 19       		.uleb128 0x19
+ 924 0130 6E       		.uleb128 0x6e
+ 925 0131 0E       		.uleb128 0xe
+ 926 0132 03       		.uleb128 0x3
+ 927 0133 0E       		.uleb128 0xe
+ 928 0134 3A       		.uleb128 0x3a
+ 929 0135 0B       		.uleb128 0xb
+ 930 0136 3B       		.uleb128 0x3b
+ 931 0137 0B       		.uleb128 0xb
+ 932 0138 00       		.byte	0
+ 933 0139 00       		.byte	0
+ 934 013a 00       		.byte	0
+ 935              		.section	.debug_loc,"",%progbits
+ 936              	.Ldebug_loc0:
+ 937              	.LLST0:
+ 938 0000 00000000 		.4byte	.LVL0
+ 939 0004 0A000000 		.4byte	.LVL2
+ 940 0008 0100     		.2byte	0x1
+ 941 000a 50       		.byte	0x50
+ 942 000b 0A000000 		.4byte	.LVL2
+ 943 000f 5A010000 		.4byte	.LVL61
+ 944 0013 0100     		.2byte	0x1
+ 945 0015 56       		.byte	0x56
+ 946 0016 5A010000 		.4byte	.LVL61
+ 947 001a 6C010000 		.4byte	.LFE63
+ 948 001e 0400     		.2byte	0x4
+ 949 0020 F3       		.byte	0xf3
+ 950 0021 01       		.uleb128 0x1
+ 951 0022 50       		.byte	0x50
+ 952 0023 9F       		.byte	0x9f
+ 953 0024 00000000 		.4byte	0
+ 954 0028 00000000 		.4byte	0
+ 955              	.LLST1:
+ 956 002c 00000000 		.4byte	.LVL0
+ 957 0030 1E000000 		.4byte	.LVL4
+ 958 0034 0100     		.2byte	0x1
+ 959 0036 51       		.byte	0x51
+ 960 0037 1E000000 		.4byte	.LVL4
+ 961 003b 6C010000 		.4byte	.LFE63
+ 962 003f 0400     		.2byte	0x4
+ 963 0041 F3       		.byte	0xf3
+ 964 0042 01       		.uleb128 0x1
+ 965 0043 51       		.byte	0x51
+ 966 0044 9F       		.byte	0x9f
+ 967 0045 00000000 		.4byte	0
+ 968 0049 00000000 		.4byte	0
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 19
+
+
+ 969              	.LLST2:
+ 970 004d 06000000 		.4byte	.LVL1
+ 971 0051 0A000000 		.4byte	.LVL2
+ 972 0055 0200     		.2byte	0x2
+ 973 0057 30       		.byte	0x30
+ 974 0058 9F       		.byte	0x9f
+ 975 0059 0A000000 		.4byte	.LVL2
+ 976 005d 1E000000 		.4byte	.LVL4
+ 977 0061 0100     		.2byte	0x1
+ 978 0063 53       		.byte	0x53
+ 979 0064 00000000 		.4byte	0
+ 980 0068 00000000 		.4byte	0
+ 981              	.LLST3:
+ 982 006c 1E000000 		.4byte	.LVL4
+ 983 0070 5A010000 		.4byte	.LVL61
+ 984 0074 0100     		.2byte	0x1
+ 985 0076 58       		.byte	0x58
+ 986 0077 00000000 		.4byte	0
+ 987 007b 00000000 		.4byte	0
+ 988              	.LLST4:
+ 989 007f 1E000000 		.4byte	.LVL4
+ 990 0083 26000000 		.4byte	.LVL6
+ 991 0087 0600     		.2byte	0x6
+ 992 0089 9E       		.byte	0x9e
+ 993 008a 04       		.uleb128 0x4
+ 994 008b 00000000 		.4byte	0
+ 995 008f 26000000 		.4byte	.LVL6
+ 996 0093 70000000 		.4byte	.LVL20
+ 997 0097 0100     		.2byte	0x1
+ 998 0099 57       		.byte	0x57
+ 999 009a 70000000 		.4byte	.LVL20
+ 1000 009e 72000000 		.4byte	.LVL21
+ 1001 00a2 0100     		.2byte	0x1
+ 1002 00a4 50       		.byte	0x50
+ 1003 00a5 72000000 		.4byte	.LVL21
+ 1004 00a9 CA000000 		.4byte	.LVL36
+ 1005 00ad 0100     		.2byte	0x1
+ 1006 00af 57       		.byte	0x57
+ 1007 00b0 CA000000 		.4byte	.LVL36
+ 1008 00b4 CC000000 		.4byte	.LVL37
+ 1009 00b8 0100     		.2byte	0x1
+ 1010 00ba 50       		.byte	0x50
+ 1011 00bb CC000000 		.4byte	.LVL37
+ 1012 00bf E4000000 		.4byte	.LVL40
+ 1013 00c3 0100     		.2byte	0x1
+ 1014 00c5 57       		.byte	0x57
+ 1015 00c6 00000000 		.4byte	0
+ 1016 00ca 00000000 		.4byte	0
+ 1017              	.LLST5:
+ 1018 00ce DC000000 		.4byte	.LVL38
+ 1019 00d2 E1000000 		.4byte	.LVL39-1
+ 1020 00d6 0100     		.2byte	0x1
+ 1021 00d8 50       		.byte	0x50
+ 1022 00d9 00000000 		.4byte	0
+ 1023 00dd 00000000 		.4byte	0
+ 1024              	.LLST6:
+ 1025 00e1 E4000000 		.4byte	.LVL40
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 20
+
+
+ 1026 00e5 EC000000 		.4byte	.LVL42
+ 1027 00e9 0100     		.2byte	0x1
+ 1028 00eb 50       		.byte	0x50
+ 1029 00ec EC000000 		.4byte	.LVL42
+ 1030 00f0 4C010000 		.4byte	.LVL60
+ 1031 00f4 0100     		.2byte	0x1
+ 1032 00f6 57       		.byte	0x57
+ 1033 00f7 00000000 		.4byte	0
+ 1034 00fb 00000000 		.4byte	0
+ 1035              	.LLST7:
+ 1036 00ff FA000000 		.4byte	.LVL45
+ 1037 0103 FE000000 		.4byte	.LVL46
+ 1038 0107 0100     		.2byte	0x1
+ 1039 0109 50       		.byte	0x50
+ 1040 010a FE000000 		.4byte	.LVL46
+ 1041 010e 16010000 		.4byte	.LVL52
+ 1042 0112 0100     		.2byte	0x1
+ 1043 0114 55       		.byte	0x55
+ 1044 0115 00000000 		.4byte	0
+ 1045 0119 00000000 		.4byte	0
+ 1046              	.LLST8:
+ 1047 011d 0C010000 		.4byte	.LVL49
+ 1048 0121 10010000 		.4byte	.LVL50
+ 1049 0125 0100     		.2byte	0x1
+ 1050 0127 50       		.byte	0x50
+ 1051 0128 10010000 		.4byte	.LVL50
+ 1052 012c 28010000 		.4byte	.LVL55
+ 1053 0130 0100     		.2byte	0x1
+ 1054 0132 54       		.byte	0x54
+ 1055 0133 00000000 		.4byte	0
+ 1056 0137 00000000 		.4byte	0
+ 1057              	.LLST9:
+ 1058 013b 28010000 		.4byte	.LVL55
+ 1059 013f 2C010000 		.4byte	.LVL56
+ 1060 0143 0100     		.2byte	0x1
+ 1061 0145 50       		.byte	0x50
+ 1062 0146 2C010000 		.4byte	.LVL56
+ 1063 014a 2F010000 		.4byte	.LVL57-1
+ 1064 014e 0100     		.2byte	0x1
+ 1065 0150 51       		.byte	0x51
+ 1066 0151 2F010000 		.4byte	.LVL57-1
+ 1067 0155 4C010000 		.4byte	.LVL60
+ 1068 0159 0100     		.2byte	0x1
+ 1069 015b 54       		.byte	0x54
+ 1070 015c 00000000 		.4byte	0
+ 1071 0160 00000000 		.4byte	0
+ 1072              	.LLST10:
+ 1073 0164 22000000 		.4byte	.LVL5
+ 1074 0168 7E000000 		.4byte	.LVL22
+ 1075 016c 0100     		.2byte	0x1
+ 1076 016e 54       		.byte	0x54
+ 1077 016f 00000000 		.4byte	0
+ 1078 0173 00000000 		.4byte	0
+ 1079              	.LLST11:
+ 1080 0177 3A000000 		.4byte	.LVL9
+ 1081 017b 3E000000 		.4byte	.LVL10
+ 1082 017f 0100     		.2byte	0x1
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 21
+
+
+ 1083 0181 50       		.byte	0x50
+ 1084 0182 3E000000 		.4byte	.LVL10
+ 1085 0186 56000000 		.4byte	.LVL16
+ 1086 018a 0100     		.2byte	0x1
+ 1087 018c 5A       		.byte	0x5a
+ 1088 018d 00000000 		.4byte	0
+ 1089 0191 00000000 		.4byte	0
+ 1090              	.LLST12:
+ 1091 0195 4C000000 		.4byte	.LVL13
+ 1092 0199 50000000 		.4byte	.LVL14
+ 1093 019d 0100     		.2byte	0x1
+ 1094 019f 50       		.byte	0x50
+ 1095 01a0 50000000 		.4byte	.LVL14
+ 1096 01a4 72000000 		.4byte	.LVL21
+ 1097 01a8 0100     		.2byte	0x1
+ 1098 01aa 55       		.byte	0x55
+ 1099 01ab 00000000 		.4byte	0
+ 1100 01af 00000000 		.4byte	0
+ 1101              	.LLST13:
+ 1102 01b3 7E000000 		.4byte	.LVL22
+ 1103 01b7 E8000000 		.4byte	.LVL41
+ 1104 01bb 0100     		.2byte	0x1
+ 1105 01bd 54       		.byte	0x54
+ 1106 01be 00000000 		.4byte	0
+ 1107 01c2 00000000 		.4byte	0
+ 1108              	.LLST14:
+ 1109 01c6 94000000 		.4byte	.LVL25
+ 1110 01ca 98000000 		.4byte	.LVL26
+ 1111 01ce 0100     		.2byte	0x1
+ 1112 01d0 50       		.byte	0x50
+ 1113 01d1 98000000 		.4byte	.LVL26
+ 1114 01d5 B0000000 		.4byte	.LVL32
+ 1115 01d9 0100     		.2byte	0x1
+ 1116 01db 5A       		.byte	0x5a
+ 1117 01dc 00000000 		.4byte	0
+ 1118 01e0 00000000 		.4byte	0
+ 1119              	.LLST15:
+ 1120 01e4 A6000000 		.4byte	.LVL29
+ 1121 01e8 AA000000 		.4byte	.LVL30
+ 1122 01ec 0100     		.2byte	0x1
+ 1123 01ee 50       		.byte	0x50
+ 1124 01ef AA000000 		.4byte	.LVL30
+ 1125 01f3 CC000000 		.4byte	.LVL37
+ 1126 01f7 0100     		.2byte	0x1
+ 1127 01f9 55       		.byte	0x55
+ 1128 01fa 00000000 		.4byte	0
+ 1129 01fe 00000000 		.4byte	0
+ 1130              		.section	.debug_aranges,"",%progbits
+ 1131 0000 1C000000 		.4byte	0x1c
+ 1132 0004 0200     		.2byte	0x2
+ 1133 0006 00000000 		.4byte	.Ldebug_info0
+ 1134 000a 04       		.byte	0x4
+ 1135 000b 00       		.byte	0
+ 1136 000c 0000     		.2byte	0
+ 1137 000e 0000     		.2byte	0
+ 1138 0010 00000000 		.4byte	.LFB63
+ 1139 0014 6C010000 		.4byte	.LFE63-.LFB63
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 22
+
+
+ 1140 0018 00000000 		.4byte	0
+ 1141 001c 00000000 		.4byte	0
+ 1142              		.section	.debug_ranges,"",%progbits
+ 1143              	.Ldebug_ranges0:
+ 1144 0000 1E000000 		.4byte	.LBB5
+ 1145 0004 22000000 		.4byte	.LBE5
+ 1146 0008 24000000 		.4byte	.LBB7
+ 1147 000c 7A000000 		.4byte	.LBE7
+ 1148 0010 00000000 		.4byte	0
+ 1149 0014 00000000 		.4byte	0
+ 1150 0018 00000000 		.4byte	.LFB63
+ 1151 001c 6C010000 		.4byte	.LFE63
+ 1152 0020 00000000 		.4byte	0
+ 1153 0024 00000000 		.4byte	0
+ 1154              		.section	.debug_line,"",%progbits
+ 1155              	.Ldebug_line0:
+ 1156 0000 95010000 		.section	.debug_str,"MS",%progbits,1
+ 1156      02001401 
+ 1156      00000201 
+ 1156      FB0E0D00 
+ 1156      01010101 
+ 1157              	.LASF20:
+ 1158 0000 6666745F 		.ascii	"fft_buffer\000"
+ 1158      62756666 
+ 1158      657200
+ 1159              	.LASF3:
+ 1160 000b 5F5F7569 		.ascii	"__uint8_t\000"
+ 1160      6E74385F 
+ 1160      7400
+ 1161              	.LASF6:
+ 1162 0015 5F5F696E 		.ascii	"__int32_t\000"
+ 1162      7433325F 
+ 1162      7400
+ 1163              	.LASF7:
+ 1164 001f 6C6F6E67 		.ascii	"long int\000"
+ 1164      20696E74 
+ 1164      00
+ 1165              	.LASF21:
+ 1166 0028 6E756D5F 		.ascii	"num_samples\000"
+ 1166      73616D70 
+ 1166      6C657300 
+ 1167              	.LASF34:
+ 1168 0034 6C65645F 		.ascii	"led_red_Write\000"
+ 1168      7265645F 
+ 1168      57726974 
+ 1168      6500
+ 1169              	.LASF15:
+ 1170 0042 666C6F61 		.ascii	"float\000"
+ 1170      7400
+ 1171              	.LASF24:
+ 1172 0048 6E6F6973 		.ascii	"noise_sum\000"
+ 1172      655F7375 
+ 1172      6D00
+ 1173              	.LASF1:
+ 1174 0052 756E7369 		.ascii	"unsigned char\000"
+ 1174      676E6564 
+ 1174      20636861 
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 23
+
+
+ 1174      7200
+ 1175              	.LASF30:
+ 1176 0060 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1176      43313120 
+ 1176      352E342E 
+ 1176      31203230 
+ 1176      31363036 
+ 1177 0093 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1177      20726576 
+ 1177      6973696F 
+ 1177      6E203233 
+ 1177      37373135 
+ 1178 00c6 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1178      66756E63 
+ 1178      74696F6E 
+ 1178      2D736563 
+ 1178      74696F6E 
+ 1179              	.LASF8:
+ 1180 00ee 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1180      20756E73 
+ 1180      69676E65 
+ 1180      6420696E 
+ 1180      7400
+ 1181              	.LASF5:
+ 1182 0100 73686F72 		.ascii	"short unsigned int\000"
+ 1182      7420756E 
+ 1182      7369676E 
+ 1182      65642069 
+ 1182      6E7400
+ 1183              	.LASF28:
+ 1184 0113 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1184      52784275 
+ 1184      66666572 
+ 1184      00
+ 1185              	.LASF4:
+ 1186 0120 5F5F7569 		.ascii	"__uint16_t\000"
+ 1186      6E743136 
+ 1186      5F7400
+ 1187              	.LASF16:
+ 1188 012b 646F7562 		.ascii	"double\000"
+ 1188      6C6500
+ 1189              	.LASF31:
+ 1190 0132 63666172 		.ascii	"cfar.c\000"
+ 1190      2E6300
+ 1191              	.LASF25:
+ 1192 0139 6E6F6973 		.ascii	"noise_avg\000"
+ 1192      655F6176 
+ 1192      6700
+ 1193              	.LASF11:
+ 1194 0143 756E7369 		.ascii	"unsigned int\000"
+ 1194      676E6564 
+ 1194      20696E74 
+ 1194      00
+ 1195              	.LASF10:
+ 1196 0150 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1196      206C6F6E 
+ 1196      6720756E 
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 24
+
+
+ 1196      7369676E 
+ 1196      65642069 
+ 1197              	.LASF12:
+ 1198 0167 75696E74 		.ascii	"uint8_t\000"
+ 1198      385F7400 
+ 1199              	.LASF33:
+ 1200 016f 72756E5F 		.ascii	"run_cfar\000"
+ 1200      63666172 
+ 1200      00
+ 1201              	.LASF29:
+ 1202 0178 63666172 		.ascii	"cfar_output\000"
+ 1202      5F6F7574 
+ 1202      70757400 
+ 1203              	.LASF14:
+ 1204 0184 696E7433 		.ascii	"int32_t\000"
+ 1204      325F7400 
+ 1205              	.LASF19:
+ 1206 018c 73697A65 		.ascii	"sizetype\000"
+ 1206      74797065 
+ 1206      00
+ 1207              	.LASF9:
+ 1208 0195 6C6F6E67 		.ascii	"long long int\000"
+ 1208      206C6F6E 
+ 1208      6720696E 
+ 1208      7400
+ 1209              	.LASF17:
+ 1210 01a3 63686172 		.ascii	"char\000"
+ 1210      00
+ 1211              	.LASF2:
+ 1212 01a8 73686F72 		.ascii	"short int\000"
+ 1212      7420696E 
+ 1212      7400
+ 1213              	.LASF22:
+ 1214 01b2 4D494E5F 		.ascii	"MIN_MAG\000"
+ 1214      4D414700 
+ 1215              	.LASF13:
+ 1216 01ba 75696E74 		.ascii	"uint16_t\000"
+ 1216      31365F74 
+ 1216      00
+ 1217              	.LASF27:
+ 1218 01c3 6D61676E 		.ascii	"magnitude\000"
+ 1218      69747564 
+ 1218      6500
+ 1219              	.LASF26:
+ 1220 01cd 74687265 		.ascii	"threshold\000"
+ 1220      73686F6C 
+ 1220      6400
+ 1221              	.LASF18:
+ 1222 01d7 6C6F6E67 		.ascii	"long double\000"
+ 1222      20646F75 
+ 1222      626C6500 
+ 1223              	.LASF0:
+ 1224 01e3 7369676E 		.ascii	"signed char\000"
+ 1224      65642063 
+ 1224      68617200 
+ 1225              	.LASF32:
+ 1226 01ef 443A5C4D 		.ascii	"D:\\MS\\HDA\\Embedded\\Second_sem\\System_Driven_Ha"
+ARM GAS  C:\Users\DHEERA~1\AppData\Local\Temp\cckf2S1I.s 			page 25
+
+
+ 1226      535C4844 
+ 1226      415C456D 
+ 1226      62656464 
+ 1226      65645C53 
+ 1227 021d 72647761 		.ascii	"rdware_Design\\Lab5\\v7\\Final_Design.cydsn\\Final_"
+ 1227      72655F44 
+ 1227      65736967 
+ 1227      6E5C4C61 
+ 1227      62355C76 
+ 1228 024c 44657369 		.ascii	"Design.cydsn\000"
+ 1228      676E2E63 
+ 1228      7964736E 
+ 1228      00
+ 1229              	.LASF23:
+ 1230 0259 616C7068 		.ascii	"alpha\000"
+ 1230      6100
+ 1231              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
